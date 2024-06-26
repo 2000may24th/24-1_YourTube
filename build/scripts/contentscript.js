@@ -16,7 +16,239 @@ async function replaceNewVideos() {
         const newContent = document.createElement('div');
         newContent.className = 'newcontent';
         newContent.id = 'mycontent';
+/*
+        // 버튼 컨테이너 생성
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
+        buttonContainer.style = `
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        `;
 
+        // 초기 버튼 설정 (A~E)
+        let selectedLabels = ['A', 'B', 'C', 'D', 'E'];
+        const buttonLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+        function createButton(label) {
+            const button = document.createElement('button');
+            button.textContent = label;
+            button.style = `
+                padding: 10px 20px;
+                background-color: #333;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                position: relative;
+            `;
+            button.onmouseover = () => button.style.backgroundColor = '#555';
+            button.onmouseout = () => button.style.backgroundColor = '#333';
+            button.onclick = () => {
+                toggleSubButtons(button);
+            };
+            return button;
+        }
+
+        function createSubButton(label) {
+            const subButton = document.createElement('button');
+            subButton.textContent = label;
+            subButton.style = `
+                padding: 5px 10px;
+                background-color: #555;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                margin-top: 5px;
+                display: block;
+            `;
+            subButton.onmouseover = () => subButton.style.backgroundColor = '#777';
+            subButton.onmouseout = () => subButton.style.backgroundColor = '#555';
+            return subButton;
+        }
+
+        function toggleSubButtons(mainButton) {
+            let subButtonsContainer = mainButton.querySelector('.sub-buttons-container');
+            if (!subButtonsContainer) {
+                subButtonsContainer = document.createElement('div');
+                subButtonsContainer.className = 'sub-buttons-container';
+                subButtonsContainer.style = `
+                    display: flex;
+                    flex-direction: column;
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    background-color: #444;
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin-top: 5px;
+                    z-index: 1000;
+                `;
+
+                const initialSubButtons = ['a', 'b'];
+                initialSubButtons.forEach(label => {
+                    const subButton = createSubButton(label);
+                    subButtonsContainer.appendChild(subButton);
+                });
+
+                const addButton = createSubButton('추가');
+                addButton.onclick = () => {
+                    const newLabel = prompt('새로운 버튼 이름을 입력하세요:');
+                    if (newLabel) {
+                        const newSubButton = createSubButton(newLabel);
+                        subButtonsContainer.insertBefore(newSubButton, addButton);
+                    }
+                };
+                subButtonsContainer.appendChild(addButton);
+
+                mainButton.appendChild(subButtonsContainer);
+            } else {
+                mainButton.removeChild(subButtonsContainer);
+            }
+        }
+
+        function updateButtons() {
+            buttonContainer.innerHTML = '';
+            selectedLabels.forEach(label => {
+                const button = createButton(label);
+                buttonContainer.appendChild(button);
+            });
+            // 버튼 6 (토글창 열기 버튼) 추가
+            const toggleButton = document.createElement('button');
+            toggleButton.textContent = '선택';
+            toggleButton.style = `
+                padding: 10px 20px;
+                background-color: #333;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            `;
+            toggleButton.onmouseover = () => toggleButton.style.backgroundColor = '#555';
+            toggleButton.onmouseout = () => toggleButton.style.backgroundColor = '#333';
+            toggleButton.onclick = showToggleWindow;
+            buttonContainer.appendChild(toggleButton);
+        }
+
+        function showToggleWindow() {
+            const overlay = document.createElement('div');
+            overlay.style = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+
+            const toggleWindow = document.createElement('div');
+            toggleWindow.style = `
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            `;
+
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.style = `
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 10px;
+                margin-bottom: 20px;
+            `;
+
+            const checkboxes = buttonLabels.map(label => {
+                const labelElement = document.createElement('label');
+                labelElement.style = `
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                `;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = label;
+                checkbox.checked = selectedLabels.includes(label);
+                labelElement.appendChild(checkbox);
+                labelElement.appendChild(document.createTextNode(label));
+                checkboxContainer.appendChild(labelElement);
+                return checkbox;
+            });
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = '저장';
+            saveButton.style = `
+                padding: 10px 20px;
+                background-color: #333;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            `;
+            saveButton.onmouseover = () => saveButton.style.backgroundColor = '#555';
+            saveButton.onmouseout = () => saveButton.style.backgroundColor = '#333';
+            saveButton.onclick = () => {
+                selectedLabels = checkboxes.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value).slice(0, 5);
+                updateButtons();
+                document.body.removeChild(overlay);
+            };
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = '취소';
+            cancelButton.style = `
+                padding: 10px 20px;
+                margin-left: 10px;
+                background-color: #333;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            `;
+            cancelButton.onmouseover = () => cancelButton.style.backgroundColor = '#555';
+            cancelButton.onmouseout = () => cancelButton.style.backgroundColor = '#333';
+            cancelButton.onclick = () => {
+                document.body.removeChild(overlay);
+            };
+
+            const buttonGroup = document.createElement('div');
+            buttonGroup.style = `
+                display: flex;
+                justify-content: center;
+            `;
+            buttonGroup.appendChild(saveButton);
+            buttonGroup.appendChild(cancelButton);
+
+            toggleWindow.appendChild(checkboxContainer);
+            toggleWindow.appendChild(buttonGroup);
+            overlay.appendChild(toggleWindow);
+            document.body.appendChild(overlay);
+        }
+
+        updateButtons();
+
+        const containerDiv = document.createElement('div');
+        containerDiv.className = 'container';
+        containerDiv.style = `
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            align-items: flex-start;
+            margin-top: 50px;
+            margin-bottom: 15px;
+            margin-left: 20px;
+        `;
+*/
         // Add a container for the "최신순" text and the video content
         const containerDiv = document.createElement('div');
         containerDiv.className = 'container';
@@ -39,7 +271,10 @@ async function replaceNewVideos() {
             font-weight: bold;
             color: white;
         `;
-
+        //buttonContainer도 주석 해제해야 함!
+        /*
+        containerDiv.appendChild(buttonContainer);
+        */
         containerDiv.appendChild(latestText);
         containerDiv.appendChild(newContent);
         parentElement.appendChild(containerDiv);
